@@ -2,25 +2,9 @@ require 'nokogiri'
 require 'open-uri'
 require 'CSV'
 
-#Get a Nokogiri::HTML::Document for the page
 
 doc = Nokogiri::HTML(open('ebay.html', 
                           'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36'))
-
-
-# Class names to look for : nume_item_title, nume_price, nume_b_format span, 
-# 1. Capture all titles as an array.
-# 2. 
-
-
-# [Title: ?, Price: ?, Format: ?]
-#
-# 
-# 
-# 
-# 
-# 
-# 
 
 class Item
 	attr_accessor :title, :price, :order_option
@@ -33,6 +17,9 @@ class Item
 
 	def to_s
 		"Title: #{title}, Price: #{price}, Order Option: #{order_option}"
+	end
+	def to_a
+		[title, price, order_option]
 	end
 end
 
@@ -66,6 +53,22 @@ class GetInfo
 	end
 end
 
+class WriteCSV
+	def initialize(items, file)
+		@items = items
+		write(file)
+	end
+
+	def write(file)
+		CSV.open(file, "wb", :write_headers=> true, :headers => ["Title","Price","Order Option"]) do |csv|
+			@items.each do |item|
+				csv << item.to_a
+			end
+		end
+	end
+end
+
 new_data = GetInfo.new(doc)
-puts new_data.items
+file = 'data.csv'
+WriteCSV.new(new_data.items, file)
 
