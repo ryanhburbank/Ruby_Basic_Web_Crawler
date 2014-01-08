@@ -22,39 +22,50 @@ doc = Nokogiri::HTML(open('ebay.html',
 # 
 # 
 
-# class ItemInfo
-# 	def get_title
-# 	end
+class Item
+	attr_accessor :title, :price, :order_option
 
-# 	def get_price
-# 	end
+	def initialize(title, price, order_option)
+		self.title = title
+		self.price = price
+		self.order_option = order_option
+	end
 
-
-# end
-
-title_array = []
-price_array = []
-order_option = []
-item_array = []
-item = {}
-
-doc.css('.nume_item_title').each do |title|
-	title = title.text.gsub("\n",'')
-  title_array << title
+	def to_s
+		"Title: #{title}, Price: #{price}, Order Option: #{order_option}"
+	end
 end
-doc.css('.nume_price').each do |price|
-	price = price.text.gsub("\n",'')
-	price_array << price
-end
-doc.css('.nume_b_format span').each do |order|
-	order = order.text.gsub("\n", '')
-	order_option << order
-end 
 
-(title_array.length).times do |i|
-	item = { :title => title_array[i],
-					 :price => price_array[i],
-					 :order_option => order_option[i]}
-	item_array << item
+class GetInfo
+	attr_accessor :doc, :items
+
+	def initialize(url)
+		self.doc = url
+		title_array = write_type('.nume_item_title')
+		price_array = write_type('.nume_price')
+		order_option = write_type('.nume_b_format')
+		self.items = create_items(title_array, price_array, order_option)
+	end
+
+	def write_type(css_class)
+		type_array = []
+		doc.css(css_class).each do |type|
+			type = type.text.gsub("\n", '')
+			type_array << type
+		end
+		type_array
+	end
+
+	def create_items(titles, prices, order_options)
+		item_array = []
+		(titles.length).times do |i|
+			item = Item.new(titles[i], prices[i], order_options[i])
+			item_array << item
+		end
+		item_array
+	end
 end
+
+new_data = GetInfo.new(doc)
+puts new_data.items
 
