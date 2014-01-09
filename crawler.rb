@@ -3,25 +3,14 @@ require 'open-uri'
 require 'CSV'
 
 #Get a Nokogiri::HTML::Document for the page
-
-doc = Nokogiri::HTML(open('ebay.html', 
-                          'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36'))
+USERAGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36'
+SOURCE = 'ebay.html'
+# doc = Nokogiri::HTML(open(SOURCE, 'User-Agent' => USERAGENT))
 
 
 # Class names to look for : nume_item_title, nume_price, nume_b_format span, 
 # 1. Capture all titles as an array.
 # 2. 
-
-
-# [Title: ?, Price: ?, Format: ?]
-#
-# 
-# 
-# 
-# 
-# 
-# 
-
 class Item
 	attr_accessor :title, :price, :order_option
 
@@ -39,8 +28,8 @@ end
 class GetInfo
 	attr_accessor :doc, :items
 
-	def initialize(url)
-		self.doc = url
+	def initialize
+		self.doc = Nokogiri::HTML(open(SOURCE, 'User-Agent' => USERAGENT))
 		title_array = write_type('.nume_item_title')
 		price_array = write_type('.nume_price')
 		order_option = write_type('.nume_b_format')
